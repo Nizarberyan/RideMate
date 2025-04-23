@@ -11,9 +11,13 @@ use Inertia\Inertia;
 Route::get('login', function () {
     return inertia('auth/Login');
 });
+Route::get('/', function () {
+    return inertia('Home');
+});
 Route::post('/login', [AuthController::class, 'login'])->name('login');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
-Route::get('register', function () {
+Route::post('/register',[AuthController::class, 'register'])->name('register');
+Route::get('/register', function () {
     return inertia('auth/Register');
 });
 
@@ -32,9 +36,15 @@ Route::put('/rides/{ride}', [RideController::class, 'update'])->name('rides.upda
 Route::patch('/rides/{ride}/cancel', [RideController::class, 'cancel'])->name('rides.cancel')->middleware('auth');
 Route::patch('/rides/{ride}/complete', [RideController::class, 'complete'])->name('rides.complete')->middleware('auth');
 
-// Bookings routes
-Route::get('/bookings', [BookingController::class, 'index'])->name('bookings.index')->middleware('auth');
+
 Route::get('/rides/{ride}/book', [BookingController::class, 'create'])->name('bookings.create')->middleware('auth');
-Route::post('/rides/{ride}/book', [BookingController::class, 'store'])->name('bookings.store')->middleware('auth');
 Route::get('/bookings/{booking}', [BookingController::class, 'show'])->name('bookings.show')->middleware('auth');
-Route::patch('/bookings/{booking}/cancel', [BookingController::class, 'cancel'])->name('bookings.cancel')->middleware('auth');
+Route::middleware(['auth'])->group(function () {
+    Route::post('/rides/{ride}/book', [BookingController::class, 'store'])->name('rides.book');
+});
+Route::middleware(['auth'])->group(function () {
+
+    Route::post('/bookings', [BookingController::class, 'create'])->name('bookings.create');
+    Route::get('/bookings', [BookingController::class, 'index'])->name('bookings.index');
+    Route::patch('/bookings/{booking}/cancel', [BookingController::class, 'cancel'])->name('bookings.cancel');
+});

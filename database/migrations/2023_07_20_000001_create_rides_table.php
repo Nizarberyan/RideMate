@@ -18,11 +18,11 @@ return new class extends Migration
             $table->string('end_location');
             $table->dateTime('departure_datetime');
             $table->integer('available_seats');
-            $table->decimal('price', 8, 2)->nullable();
+
             $table->enum('status', ['active', 'completed', 'cancelled'])->default('active');
             $table->text('description')->nullable();
             $table->decimal('distance_km', 8, 2)->nullable();
-            $table->json('route_waypoints')->nullable();
+
             $table->timestamps();
         });
     }

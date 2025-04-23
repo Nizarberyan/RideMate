@@ -1,12 +1,22 @@
 {
-    "compilerOptions": {
-        "target": "esnext",
-        "module": "esnext",
-        "moduleResolution": "node",
-        "jsx": "react",
-        "strict": true,
-        "types": ["vite/client"],
-        // Include if using Vite
-        "allowSyntheticDefaultImports": true
-    }
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+        "@/*": ["./resources/js/*"]
+
+    },
+    "target": "esnext",
+    "module": "esnext",
+    "moduleResolution": "node",
+    "jsx": "react",
+    "strict": true,
+    "types": ["vite/client"],
+    // Include if using Vite
+    "allowSyntheticDefaultImports": true,
+    // ... other options
+    "typeRoots": [
+      "./node_modules/@types",
+      "./resources/js/types"
+    ]
+  }
 }

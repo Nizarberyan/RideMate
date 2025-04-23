@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('bookings', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->foreignId('ride_id')->constrained()->onDelete('cascade');
-            $table->foreignId('passenger_id')->constrained('users')->onDelete('cascade');
             $table->integer('seats_booked')->default(1);
             $table->enum('status', ['pending', 'confirmed', 'cancelled', 'completed'])->default('pending');
             $table->decimal('total_price', 8, 2)->nullable();

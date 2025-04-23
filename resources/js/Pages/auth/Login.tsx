@@ -1,205 +1,159 @@
-import React, { useState } from "react";
-import axios from "axios";
-import { router } from "@inertiajs/react";
-interface LoginProps {}
+// resources/js/Pages/auth/Login.tsx
+import React, { FormEvent } from "react";
+import { Head, useForm, Link } from "@inertiajs/react";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { FaEnvelope, FaLock } from "react-icons/fa";
 
-const Login: React.FC<LoginProps> = () => {
-    const [email, setEmail] = useState<string>("");
-    const [password, setPassword] = useState<string>("");
-    const [rememberMe, setRememberMe] = useState<boolean>(false);
-    const [error, setError] = useState("");
+export default function Login() {
+    const { data, setData, post, processing, errors } = useForm({
+        email: "",
+        password: "",
+        remember: false,
+    });
 
-    const handleSubmit = async (e: React.FormEvent) => {
+    const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        setError("");
-        try {
-            const response = await axios.post("/login", {
-                email,
-                password,
-                remember: rememberMe,
-            });
-
-            router.visit("/dashboard");
-        } catch (err) {
-            setError("Invalid email or password");
-            console.error(err);
-        }
+        post("/login");
     };
 
     return (
-        <div className="flex items-center justify-center bg-gray-100 py-12">
-            <div className="max-w-md w-full space-y-8 p-10 bg-white rounded-xl shadow-2xl transform transition-all hover:scale-[1.01] animate-fadeIn">
-                <div className="flex flex-col items-center">
-                    {/* Logo placeholder */}
-                    <div className="w-20 h-20 rounded-full bg-gradient-to-r from-indigo-500 to-purple-600 flex items-center justify-center text-white text-2xl font-bold mb-4">
-                        RM
-                    </div>
-                    <h2 className="text-center text-3xl font-extrabold text-gray-900">
-                        Welcome Back
-                    </h2>
-                    <p className="mt-2 text-center text-sm text-gray-600">
-                        Please sign in to your account
-                    </p>
-                </div>
-
-                <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-                    <div className="space-y-5">
-                        <div>
-                            <label
-                                htmlFor="username"
-                                className="block text-sm font-medium text-gray-700"
-                            >
-                                Username
-                            </label>
-                            <div className="mt-1 relative rounded-md shadow-sm">
-                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        className="h-5 w-5 text-gray-400"
-                                        viewBox="0 0 20 20"
-                                        fill="currentColor"
-                                    >
-                                        <path
-                                            fillRule="evenodd"
-                                            d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
-                                            clipRule="evenodd"
-                                        />
-                                    </svg>
+        <>
+            <Head title="Login" />
+            <div className="flex items-center justify-center w-full h-full min-h-[80vh]">
+                <div className="w-full max-w-5xl mx-auto px-4">
+                    <div className="bg-white/50 backdrop-blur-sm shadow-2xl rounded-2xl overflow-hidden lg:grid lg:grid-cols-2 ">
+                        <div className="hidden lg:block bg-gradient-to-br from-blue-500 to-blue-700 text-white p-12">
+                            <div className="h-full flex flex-col justify-center">
+                                <h2 className="text-4xl xl:text-5xl font-bold mb-8">
+                                    Welcome Back!
+                                </h2>
+                                <p className="text-xl xl:text-2xl mb-10">
+                                    Log in to continue your journey with
+                                    RideMate
+                                </p>
+                                <div className="bg-white/20 p-8 rounded-xl mt-auto">
+                                    <p className="text-xl italic">
+                                        "Your ride, your way, every day"
+                                    </p>
                                 </div>
-                                <input
-                                    id="email"
-                                    name="email"
-                                    type="email"
-                                    required
-                                    className="pl-10 block w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
-                                    placeholder="Enter your email"
-                                    value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
-                                />
                             </div>
                         </div>
 
-                        <div>
-                            <label
-                                htmlFor="password"
-                                className="block text-sm font-medium text-gray-700"
+                        {/* Login Form Section */}
+                        <div className="p-8 lg:p-12 flex items-center justify-center">
+                            <form
+                                onSubmit={handleSubmit}
+                                className="w-full space-y-8"
                             >
-                                Password
-                            </label>
-                            <div className="mt-1 relative rounded-md shadow-sm">
-                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        className="h-5 w-5 text-gray-400"
-                                        viewBox="0 0 20 20"
-                                        fill="currentColor"
+                                <h2 className="text-3xl lg:text-4xl font-bold mb-8 text-center text-blue-600">
+                                    Login
+                                </h2>
+
+                                <div className="space-y-3">
+                                    <Label
+                                        htmlFor="email"
+                                        className="flex items-center text-lg lg:text-xl"
                                     >
-                                        <path
-                                            fillRule="evenodd"
-                                            d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z"
-                                            clipRule="evenodd"
-                                        />
-                                    </svg>
+                                        <FaEnvelope className="mr-3 text-2xl text-blue-500" />
+                                        Email
+                                    </Label>
+                                    <Input
+                                        id="email"
+                                        type="email"
+                                        value={data.email}
+                                        onChange={(e) =>
+                                            setData("email", e.target.value)
+                                        }
+                                        placeholder="Enter your email"
+                                        className="py-3 text-lg"
+                                    />
+                                    {errors.email && (
+                                        <p className="text-red-500 text-sm mt-1">
+                                            {errors.email}
+                                        </p>
+                                    )}
                                 </div>
-                                <input
-                                    id="password"
-                                    name="password"
-                                    type="password"
-                                    required
-                                    className="pl-10 block w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
-                                    placeholder="Enter your password"
-                                    value={password}
-                                    onChange={(e) =>
-                                        setPassword(e.target.value)
-                                    }
-                                />
-                            </div>
-                        </div>
 
-                        <div className="flex items-center justify-between">
-                            <div className="flex items-center">
-                                <input
-                                    id="remember-me"
-                                    name="remember-me"
-                                    type="checkbox"
-                                    className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
-                                    checked={rememberMe}
-                                    onChange={(e) =>
-                                        setRememberMe(e.target.checked)
-                                    }
-                                />
-                                <label
-                                    htmlFor="remember-me"
-                                    className="ml-2 block text-sm text-gray-700"
+                                <div className="space-y-3">
+                                    <Label
+                                        htmlFor="password"
+                                        className="flex items-center text-lg lg:text-xl"
+                                    >
+                                        <FaLock className="mr-3 text-2xl text-blue-500" />
+                                        Password
+                                    </Label>
+                                    <Input
+                                        id="password"
+                                        type="password"
+                                        value={data.password}
+                                        onChange={(e) =>
+                                            setData("password", e.target.value)
+                                        }
+                                        placeholder="Enter your password"
+                                        className="py-3 text-lg"
+                                    />
+                                    {errors.password && (
+                                        <p className="text-red-500 text-sm mt-1">
+                                            {errors.password}
+                                        </p>
+                                    )}
+                                </div>
+
+                                <div className="flex justify-between items-center mt-6">
+                                    <div className="flex items-center">
+                                        <input
+                                            type="checkbox"
+                                            id="remember"
+                                            checked={data.remember}
+                                            onChange={(e) =>
+                                                setData(
+                                                    "remember",
+                                                    e.target.checked,
+                                                )
+                                            }
+                                            className="mr-3 w-5 h-5 text-blue-600 rounded focus:ring-blue-500"
+                                        />
+                                        <Label
+                                            htmlFor="remember"
+                                            className="text-gray-700 text-lg"
+                                        >
+                                            Remember me
+                                        </Label>
+                                    </div>
+                                    <Link
+                                        href="/forgot-password"
+                                        className="text-blue-600 hover:underline text-lg"
+                                    >
+                                        Forgot password?
+                                    </Link>
+                                </div>
+
+                                <Button
+                                    type="submit"
+                                    disabled={processing}
+                                    className="w-full p-4 text-xl bg-blue-600 hover:bg-blue-700 rounded-xl mt-8"
                                 >
-                                    Remember me
-                                </label>
-                            </div>
-                            <div className="text-sm">
-                                <a
-                                    href="#"
-                                    className="font-medium text-indigo-600 hover:text-indigo-500 transition-colors"
-                                >
-                                    Forgot password?
-                                </a>
-                            </div>
+                                    {processing ? "Logging in..." : "Login"}
+                                </Button>
+
+                                <div className="text-center mt-6">
+                                    <p className="text-lg text-gray-600">
+                                        Don't have an account?{" "}
+                                        <Link
+                                            href="/register"
+                                            className="text-blue-600 hover:underline font-semibold"
+                                        >
+                                            Sign up
+                                        </Link>
+                                    </p>
+                                </div>
+                            </form>
                         </div>
                     </div>
-
-                    {error && (
-                        <div className="text-red-500 text-sm text-center bg-red-50 p-3 rounded-lg border border-red-100">
-                            <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                className="h-5 w-5 text-red-500 inline-block mr-1"
-                                viewBox="0 0 20 20"
-                                fill="currentColor"
-                            >
-                                <path
-                                    fillRule="evenodd"
-                                    d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
-                                    clipRule="evenodd"
-                                />
-                            </svg>
-                            {error}
-                        </div>
-                    )}
-
-                    <div>
-                        <button
-                            type="submit"
-                            className="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-lg text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transform transition-all active:scale-95 shadow-lg hover:shadow-xl"
-                        >
-                            <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                className="h-5 w-5 mr-2"
-                                viewBox="0 0 20 20"
-                                fill="currentColor"
-                            >
-                                <path
-                                    fillRule="evenodd"
-                                    d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z"
-                                    clipRule="evenodd"
-                                />
-                            </svg>
-                            Sign in
-                        </button>
-                    </div>
-                </form>
-
-                <div className="text-center mt-4 border-t pt-4">
-                    <p className="text-sm text-gray-600">
-                        Don't have an account?{" "}
-                        <a
-                            href="/register"
-                            className="font-medium text-indigo-600 hover:text-indigo-500 transition-colors"
-                        >
-                            Sign up now
-                        </a>
-                    </p>
                 </div>
             </div>
-        </div>
+        </>
     );
-};
-
-export default Login;
+}
