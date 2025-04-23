@@ -12,6 +12,7 @@ import {
     FaInfoCircle,
 } from "react-icons/fa";
 import { ArrowRight } from "lucide-react";
+import { Label } from "@/components/ui/label";
 
 interface User {
     id: number;
@@ -75,22 +76,23 @@ const getStatusStyle = (status: Ride["status"]) => {
 
 const Rides = ({ rides = [] }: Props) => {
     const { auth } = usePage<PageProps>().props;
-    const [searchQuery, setSearchQuery] = useState("");
+    const [fromLocation, setFromLocation] = useState("");
+    const [toLocation, setToLocation] = useState("");
     const [statusFilter, setStatusFilter] = useState<string>("all");
 
     const filteredRides = rides.filter((ride) => {
-        const lowerQuery = searchQuery.toLowerCase();
-        const matchesSearch =
-            ride.start_location.toLowerCase().includes(lowerQuery) ||
-            ride.end_location.toLowerCase().includes(lowerQuery) ||
-            ride.driver.name.toLowerCase().includes(lowerQuery) ||
-            (ride.description &&
-                ride.description.toLowerCase().includes(lowerQuery));
-
+        const matchesFrom =
+            fromLocation === "" ||
+            ride.start_location
+                .toLowerCase()
+                .includes(fromLocation.toLowerCase());
+        const matchesTo =
+            toLocation === "" ||
+            ride.end_location.toLowerCase().includes(toLocation.toLowerCase());
         const matchesStatus =
             statusFilter === "all" || ride.status === statusFilter;
 
-        return matchesSearch && matchesStatus;
+        return matchesFrom && matchesTo && matchesStatus;
     });
 
     const formatDateTime = (dateTime: string) => {
@@ -130,27 +132,62 @@ const Rides = ({ rides = [] }: Props) => {
                 </div>
 
                 <div className="mb-8 bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4">
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
-                        <div className="relative md:col-span-2">
-                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <FaSearch
-                                    className="h-5 w-5 text-gray-400"
-                                    aria-hidden="true"
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
+                        <div className="relative">
+                            <Label
+                                htmlFor="from-location"
+                                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                            >
+                                From
+                            </Label>
+                            <div className="relative">
+                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <FaMapMarkerAlt className="h-5 w-5 text-red-500" />
+                                </div>
+                                <input
+                                    id="from-location"
+                                    type="text"
+                                    placeholder="Departure location..."
+                                    className="block w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out sm:text-sm"
+                                    value={fromLocation}
+                                    onChange={(e) =>
+                                        setFromLocation(e.target.value)
+                                    }
                                 />
                             </div>
-                            <input
-                                type="text"
-                                placeholder="Search location, driver, or description..."
-                                className="block w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out sm:text-sm"
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
-                            />
                         </div>
 
                         <div className="relative">
-                            <label htmlFor="status-filter" className="sr-only">
-                                Filter by Status
-                            </label>
+                            <Label
+                                htmlFor="to-location"
+                                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                            >
+                                To
+                            </Label>
+                            <div className="relative">
+                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <FaMapMarkerAlt className="h-5 w-5 text-green-500" />
+                                </div>
+                                <input
+                                    id="to-location"
+                                    type="text"
+                                    placeholder="Destination location..."
+                                    className="block w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out sm:text-sm"
+                                    value={toLocation}
+                                    onChange={(e) =>
+                                        setToLocation(e.target.value)
+                                    }
+                                />
+                            </div>
+                        </div>
+
+                        <div className="relative">
+                            <Label
+                                htmlFor="status-filter"
+                                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                            >
+                                Status
+                            </Label>
                             <select
                                 id="status-filter"
                                 value={statusFilter}
