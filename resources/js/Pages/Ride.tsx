@@ -11,7 +11,7 @@ import {
     FaArrowLeft,
 } from "react-icons/fa";
 import { ArrowRight } from "lucide-react";
-import { EditRideModal } from "@/Components/EditRideModal"; // Adjust path
+import { EditRideModal } from "@/components/EditRideModal"; // Adjust path
 import { useState } from "react";
 import { Button } from "@/components/ui/button"; // Import useState
 import { router } from "@inertiajs/react";
@@ -45,6 +45,7 @@ interface PageProps {
         error: string | null;
         success: string | null;
     };
+    [key: string]: any;
 }
 
 // Helper function for status colors and text

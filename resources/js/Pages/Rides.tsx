@@ -38,6 +38,7 @@ interface PageProps {
         user: User | null;
     };
     rides: Ride[];
+    [key: string]: any;
 }
 
 // Helper function for status colors and text
@@ -74,11 +75,12 @@ const getStatusStyle = (status: Ride["status"]) => {
     }
 };
 
-const Rides = ({ rides = [] }: Props) => {
+const Rides = ({ rides = [] }: PageProps) => {
     const { auth } = usePage<PageProps>().props;
     const [fromLocation, setFromLocation] = useState("");
     const [toLocation, setToLocation] = useState("");
     const [statusFilter, setStatusFilter] = useState<string>("all");
+    const [searchQuery, setSearchQuery] = useState<string>("");
 
     const filteredRides = rides.filter((ride) => {
         const matchesFrom =

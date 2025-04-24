@@ -27,7 +27,9 @@ class AuthController extends Controller
             log::info('User logged in', ['user' => $user]);
 
             return Inertia::render('Dashboard',["username" => $user->name,
-                "email" => $user->email,]);
+                "email" => $user->email,
+                "remember" => $remember,
+                "isDriver" => $user->isActiveDriver()]);
         }
 
 
@@ -68,7 +70,7 @@ class AuthController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect('/');
+        return Inertia::render('auth/Login');
     }
 
 }

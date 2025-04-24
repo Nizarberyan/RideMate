@@ -7,12 +7,12 @@ import {
     DialogTitle,
     DialogFooter,
     DialogClose,
-} from "@/Components/ui/dialog"; // Assuming you have Shadcn UI Dialog
-import { Label } from "@/Components/ui/label";
-import { Input } from "@/Components/ui/input";
-import { Textarea } from "@/Components/ui/textarea";
-import { Button } from "@/Components/ui/button";
-import InputError from "@/Components/InputError"; // Your InputError component
+} from "@/components/ui/dialog"; // Assuming you have Shadcn UI Dialog
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
+import InputError from "@/components/InputError"; // Your InputError component
 
 // --- Interface matching RideDetail ---
 interface Ride {
