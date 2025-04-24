@@ -1,10 +1,12 @@
 // resources/js/Pages/auth/Login.tsx
-import React, { FormEvent } from "react";
+import React, { FormEvent, useEffect } from "react";
 import { Head, useForm, Link } from "@inertiajs/react";
+import { Inertia } from "@inertiajs/inertia";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { FaEnvelope, FaLock } from "react-icons/fa";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function Login() {
     const { data, setData, post, processing, errors } = useForm({
@@ -17,6 +19,12 @@ export default function Login() {
         e.preventDefault();
         post("/login");
     };
+    const { isAuthenticated } = useAuth();
+    useEffect(() => {
+        if (isAuthenticated) {
+            Inertia.visit("/dashboard");
+        }
+    }, []);
 
     return (
         <>

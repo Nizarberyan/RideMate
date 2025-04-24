@@ -33,7 +33,7 @@ export default function GuestLayout({
     }, [sidebarOpen]);
 
     return (
-        <div className="flex flex-col lg:flex-row min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 antialiased overflow-x-hidden">
+        <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 antialiased">
             {/* Mobile sidebar toggle */}
             <div className="lg:hidden fixed top-4 left-4 z-50">
                 <button
@@ -57,12 +57,12 @@ export default function GuestLayout({
                 />
             )}
 
-            {/* Sidebar */}
+            {/* Fixed Sidebar */}
             <aside
                 id="sidebar-guest"
-                className={`fixed lg:sticky top-0 z-40 h-screen w-64 transform transition-transform duration-300 ease-in-out
-                    bg-white/90 backdrop-blur-md shadow-lg lg:shadow-none lg:translate-x-0 overflow-y-auto
-                    ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}`}
+                className={`fixed top-0 left-0 z-40 h-full w-64 transform transition-transform duration-300 ease-in-out
+                    bg-white/90 backdrop-blur-md shadow-lg
+                    ${sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}`}
             >
                 <div className="h-full flex flex-col py-6">
                     <div className="px-6 mb-8">
@@ -110,11 +110,9 @@ export default function GuestLayout({
                 </div>
             </aside>
 
-            {/* Main content */}
-            <main className="flex-1 w-full lg:pl-0 pt-16 lg:pt-0 px-4 pb-4">
-                <div className="max-w-4xl mx-auto min-h-[calc(100vh-2rem)]">
-                    {children}
-                </div>
+            {/* Main content - with left margin to account for fixed sidebar */}
+            <main className="lg:ml-64 min-h-screen w-full pt-16 lg:pt-0">
+                <div className="w-full">{children}</div>
             </main>
         </div>
     );

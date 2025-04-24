@@ -14,6 +14,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'remember_token',
         'driver_status',
         'driver_opted_in_at',
     ];
@@ -65,4 +66,9 @@ class User extends Authenticatable
             'driver_opted_in_at' => null,
         ]);
     }
+    public function notificationPreferences(): HasMany
+    {
+        return $this->hasMany(NotificationPreference::class);
+    }
+
 }

@@ -1,9 +1,11 @@
-import React, { FormEvent } from "react";
+import React, { FormEvent, useEffect } from "react";
 import { Head, useForm, Link } from "@inertiajs/react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { FaUser, FaEnvelope, FaLock, FaShieldAlt } from "react-icons/fa";
+import { useAuth } from "@/hooks/useAuth";
+import { Inertia } from "@inertiajs/inertia";
 
 const Register = () => {
     const { data, setData, post, processing, errors } = useForm({
@@ -17,6 +19,12 @@ const Register = () => {
         e.preventDefault();
         post("/register");
     };
+    const { isAuthenticated } = useAuth();
+    useEffect(() => {
+        if (isAuthenticated) {
+            Inertia.visit("/dashboard");
+        }
+    }, []);
 
     return (
         <>

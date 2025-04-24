@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Head, Link, usePage } from "@inertiajs/react";
 import {
     FaMapMarkerAlt,
@@ -13,10 +13,10 @@ import {
 import { ArrowRight } from "lucide-react";
 import { EditRideModal } from "@/components/EditRideModal"; // Adjust path
 import { useState } from "react";
-import { Button } from "@/components/ui/button"; // Import useState
+import { Button } from "@/components/ui/button";
 import { router } from "@inertiajs/react";
+import { useRideStatus } from "@/hooks/useRideStatus";
 
-// --- Interfaces ---
 interface User {
     id: number;
     name: string;
@@ -82,7 +82,6 @@ const getStatusStyle = (status: Ride["status"]) => {
     }
 };
 
-// Format date and time
 const formatDateTime = (dateTime: string) => {
     if (!dateTime) return { date: "N/A", time: "N/A" };
     try {
@@ -113,9 +112,14 @@ const RideDetail = () => {
     const { ride, auth, flash } = usePage<PageProps>().props;
     const [isEditModalOpen, setIsEditModalOpen] = useState(false); // Add state for modal
     const { date, time } = formatDateTime(ride.departure_datetime);
-    const statusStyle = getStatusStyle(ride.status);
-    const isDriver = auth.user?.id === ride.driver_id;
-    const canBook = auth.user && !isDriver && ride.status === "active";
+    const {
+        isRideFull,
+        canBook,
+        isDriver,
+        seatsMessage,
+        statusStyle,
+        bookingStatusMessage,
+    } = useRideStatus(ride, auth.user?.id);
 
     const handleOpenEditModal = () => setIsEditModalOpen(true);
     const handleCloseEditModal = () => setIsEditModalOpen(false);
@@ -136,14 +140,13 @@ const RideDetail = () => {
             <Head
                 title={`Ride from ${ride.start_location} to ${ride.end_location}`}
             />
-            {/* Page Header - You might render this differently based on your layout */}
+
             <div className="mb-6 flex items-center justify-between">
-                {/* This title might be rendered via a layout slot */}
                 <h2 className="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
                     Ride Details
                 </h2>
                 <Link
-                    href="/rides" // Link back to the rides list
+                    href="/rides"
                     className="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md shadow-sm text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
                 >
                     <FaArrowLeft className="mr-1.5 h-3 w-3" />
@@ -205,7 +208,6 @@ const RideDetail = () => {
                             </div>
                         </div>
 
-                        {/* Driver Info */}
                         <div className="flex items-center">
                             <FaUser className="w-5 h-5 mr-3 text-purple-500 flex-shrink-0" />
                             <div>
@@ -260,12 +262,10 @@ const RideDetail = () => {
                             </Link>
                         )}
 
-                        {/* Replace the Edit Ride Link with a Button that opens the modal */}
                         {isDriver && ride.status === "active" && (
                             <>
                                 <Button
-                                    // Remove Link component props like href
-                                    variant="outline" // Example variant using Shadcn UI Button
+                                    variant="outline"
                                     onClick={handleOpenEditModal}
                                     className="w-full sm:w-auto dark:text-gray-200 dark:border-gray-600 dark:hover:bg-gray-700"
                                 >
@@ -292,9 +292,9 @@ const RideDetail = () => {
                             </>
                         )}
 
-                        {!canBook && !isDriver && ride.status === "active" && (
+                        {!canBook && bookingStatusMessage && (
                             <p className="text-sm text-gray-500 dark:text-gray-400">
-                                You cannot book your own ride.
+                                {bookingStatusMessage}
                             </p>
                         )}
                         {ride.status !== "active" && (
@@ -315,5 +315,31 @@ const RideDetail = () => {
         </> // Close React Fragment
     );
 };
+
+const isRideFull = (ride: Ride) => ride.available_seats <= 0;
+
+const RideFullWarning = () => (
+    <div className="md:col-span-2 mt-4 p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-md">
+        <div className="flex">
+            <div className="flex-shrink-0">
+                <FaInfoCircle
+                    className="h-5 w-5 text-yellow-400"
+                    aria-hidden="true"
+                />
+            </div>
+            <div className="ml-3">
+                <h3 className="text-sm font-medium text-yellow-800 dark:text-yellow-200">
+                    Ride Full
+                </h3>
+                <div className="mt-2 text-sm text-yellow-700 dark:text-yellow-300">
+                    <p>
+                        This ride is currently at full capacity. Please check
+                        back later or search for alternative rides.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+);
 
 export default RideDetail;

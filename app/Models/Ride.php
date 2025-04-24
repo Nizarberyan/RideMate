@@ -1,10 +1,12 @@
 <?php
 namespace App\Models;
 
+use App\Events\RideCreated;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\Log;
 
 class Ride extends Model
 {
@@ -15,14 +17,31 @@ class Ride extends Model
         'end_location',
         'departure_datetime',
         'available_seats',
-        'status',
+        'distance_km',
         'description',
+        'status',
     ];
+    protected $dispatchesEvents = [
+        'created' => RideCreated::class,
+    ];
+
 
     protected $casts = [
         'departure_datetime' => 'datetime',
-        'price' => 'decimal:2',
+        'distance_km' => 'float',
+        'available_seats' => 'integer',
     ];
+    protected static function booted()
+    {
+        static::created(function ($ride) {
+            Log::info('Ride created event triggered', [
+                'ride_id' => $ride->id,
+                'start_location' => $ride->start_location,
+                'end_location' => $ride->end_location
+            ]);
+        });
+    }
+
 
     public function driver(): BelongsTo
     {

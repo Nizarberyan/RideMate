@@ -25,28 +25,28 @@ class BookingController extends Controller
     public function store(Ride $ride)
     {
         try {
-            // Verify ride is still active
+
             if ($ride->status !== 'active') {
                 throw ValidationException::withMessages([
                     'ride' => ['This ride is no longer available.']
                 ]);
             }
 
-            // Check for available seats
+
             if ($ride->available_seats <= 0) {
                 throw ValidationException::withMessages([
                     'ride' => ['No seats available for this ride.']
                 ]);
             }
 
-            // Prevent booking own ride
+
             if ($ride->driver_id === auth()->id()) {
                 throw ValidationException::withMessages([
                     'ride' => ['You cannot book your own ride.']
                 ]);
             }
 
-            // Check for existing booking
+
             $existingBooking = Booking::where('user_id', auth()->id())
                 ->where('ride_id', $ride->id)
                 ->whereNotIn('status', ['cancelled'])

@@ -2,9 +2,26 @@ import { usePage } from "@inertiajs/react";
 import React from "react";
 import { FaUserCircle, FaEnvelope, FaHome } from "react-icons/fa";
 
-export default function Dashboard({ auth, username, email }) {
-    // const { props } = usePage();
-    const user: any = auth.user;
+interface User {
+    id: number;
+    name: string;
+    email: string;
+}
+
+interface Auth {
+    user: User | null;
+}
+
+interface Props {
+    auth: Auth;
+}
+
+export default function Dashboard({ auth }: Props) {
+    const user = auth.user;
+
+    if (!user) {
+        return null;
+    }
 
     return (
         <div className="min-h-screen bg-gray-100 p-6">
@@ -13,7 +30,6 @@ export default function Dashboard({ auth, username, email }) {
                     <FaHome className="mr-4 text-4xl" />
                     <h1 className="text-3xl font-bold">Dashboard</h1>
                 </div>
-
                 <div className="p-8 space-y-6">
                     <div className="flex items-center bg-blue-50 p-4 rounded-lg shadow-sm">
                         <FaUserCircle className="text-blue-600 text-4xl mr-4" />

@@ -37,8 +37,13 @@ class RidePolicy
      */
     public function update(User $user, Ride $ride): bool
     {
-        return false;
+        return $user->id === $ride->driver_id && $ride->status === 'active';
     }
+    public function cancel(User $user, Ride $ride): bool
+    {
+        return $user->id === $ride->driver_id && $ride->status === 'active';
+    }
+
 
     /**
      * Determine whether the user can delete the model.

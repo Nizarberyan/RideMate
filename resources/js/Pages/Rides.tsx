@@ -13,6 +13,7 @@ import {
 } from "react-icons/fa";
 import { ArrowRight } from "lucide-react";
 import { Label } from "@/components/ui/label";
+import { useRideStatus } from "@/hooks/useRideStatus";
 
 interface User {
     id: number;

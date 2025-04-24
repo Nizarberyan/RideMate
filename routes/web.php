@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BookingController;
+use App\Http\Controllers\NotificationPreferenceController;
 use App\Http\Controllers\RideController;
 use App\Http\Controllers\testController;
 use Illuminate\Support\Facades\Route;
@@ -32,14 +33,18 @@ Route::get('/rides/create', [RideController::class, 'create'])->name('rides.crea
 Route::post('/rides', [RideController::class, 'store'])->name('rides.store')->middleware('auth');
 Route::get('/rides/{ride}', [RideController::class, 'show'])->name('rides.show');
 Route::get('/rides/{ride}/edit', [RideController::class, 'edit'])->name('rides.edit')->middleware('auth');
-Route::put('/rides/{ride}', [RideController::class, 'update'])->name('rides.update')->middleware('auth');
-Route::patch('/rides/{ride}/cancel', [RideController::class, 'cancel'])->name('rides.cancel')->middleware('auth');
 Route::patch('/rides/{ride}/complete', [RideController::class, 'complete'])->name('rides.complete')->middleware('auth');
 
 
 Route::get('/rides/{ride}/book', [BookingController::class, 'create'])->name('bookings.create')->middleware('auth');
 Route::get('/bookings/{booking}', [BookingController::class, 'show'])->name('bookings.show')->middleware('auth');
+Route::middleware(['auth', 'ride.owner'])->group(function () {
+    Route::put('/rides/{ride}', [RideController::class, 'update'])->name('rides.update');
+    Route::patch('/rides/{ride}/cancel', [RideController::class, 'cancel'])->name('rides.cancel');
+});
+
 Route::middleware(['auth'])->group(function () {
+    Route::post('/rides', [RideController::class, 'store'])->name('rides.store');
     Route::post('/rides/{ride}/book', [BookingController::class, 'store'])->name('rides.book');
 });
 Route::middleware(['auth'])->group(function () {
@@ -48,3 +53,11 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/bookings', [BookingController::class, 'index'])->name('bookings.index');
     Route::patch('/bookings/{booking}/cancel', [BookingController::class, 'cancel'])->name('bookings.cancel');
 });
+
+Route::middleware('auth')->group(function () {
+    Route::post('/notification-preferences', [NotificationPreferenceController::class, 'store'])
+        ->name('notification-preferences.store');
+    Route::delete('/notification-preferences/{preference}', [NotificationPreferenceController::class, 'destroy'])
+        ->name('notification-preferences.destroy');
+});
+
