@@ -6,10 +6,18 @@ import {
     FaCar,
     FaCalendarCheck,
     FaBell,
+    FaCalendarAlt,
+    FaClock,
+    FaUser,
+    FaChair,
+    FaRoad,
+    FaMapMarkerAlt,
 } from "react-icons/fa";
 import type { Ride } from "@/Pages/Rides";
 import axios from "axios";
 import { router } from "@inertiajs/react";
+import RideItem from "./RideItem";
+import BookingItem from "./BookingItem";
 
 interface User {
     id: number;
@@ -261,141 +269,41 @@ export default function Dashboard({
 
                     {/* Your Rides tab */}
                     {activeTab === "yourRides" && (
-                        <section className="bg-white p-6 rounded-lg shadow-md">
-                            <h3 className="text-xl font-semibold text-gray-800 mb-4">
-                                Your Rides
-                            </h3>
+                        <section className="space-y-6">
                             {ridesList.length === 0 && (
                                 <p className="text-gray-600">
                                     You have no rides.
                                 </p>
                             )}
-                            <ul className="divide-y divide-gray-200">
-                                {ridesList.map((ride) => (
-                                    <li
-                                        key={ride.id}
-                                        className="py-4 flex justify-between items-center"
-                                    >
-                                        <div>
-                                            <p className="font-semibold">
-                                                {ride.start_location} →{" "}
-                                                {ride.end_location}
-                                            </p>
-                                            <p className="text-sm text-gray-600">
-                                                Departure:{" "}
-                                                {new Date(
-                                                    ride.departure_datetime,
-                                                ).toLocaleString()}
-                                            </p>
-                                            <p className="text-sm">
-                                                Status:{" "}
-                                                <span
-                                                    className={
-                                                        ride.status === "active"
-                                                            ? "text-yellow-500"
-                                                            : ride.status ===
-                                                                "completed"
-                                                              ? "text-green-600"
-                                                              : "text-red-600"
-                                                    }
-                                                >
-                                                    {ride.status}
-                                                </span>
-                                            </p>
-                                        </div>
-                                        {ride.status === "active" && (
-                                            <div className="space-x-2">
-                                                <button
-                                                    onClick={() =>
-                                                        updateRideStatus(
-                                                            ride.id,
-                                                            "completed",
-                                                        )
-                                                    }
-                                                    className="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700 transition"
-                                                    type="button"
-                                                >
-                                                    Mark Complete
-                                                </button>
-                                                <button
-                                                    onClick={() =>
-                                                        updateRideStatus(
-                                                            ride.id,
-                                                            "cancelled",
-                                                        )
-                                                    }
-                                                    className="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700 transition"
-                                                    type="button"
-                                                >
-                                                    Cancel
-                                                </button>
-                                            </div>
-                                        )}
-                                    </li>
-                                ))}
-                            </ul>
+                            {ridesList.map((ride) => (
+                                <RideItem
+                                    key={ride.id}
+                                    ride={ride}
+                                    currentUserId={user.id}
+                                />
+                            ))}
                         </section>
                     )}
 
                     {/* Manage Bookings tab */}
                     {activeTab === "manageBookings" && (
-                        <section className="bg-white p-6 rounded-lg shadow-lg">
-                            <h3 className="text-2xl font-semibold mb-6 text-gray-800 border-b pb-2 border-gray-300">
-                                Manage Bookings
-                            </h3>
+                        <section className="space-y-8">
                             {ridesWithBookingsList.length === 0 ? (
                                 <p className="text-gray-600 text-center py-10">
                                     No pending bookings.
                                 </p>
                             ) : (
-                                ridesWithBookingsList.map((ride) => (
-                                    <div key={ride.id} className="mb-8">
-                                        <h4 className="font-semibold text-lg mb-2">
-                                            Ride: {ride.start_location} →{" "}
-                                            {ride.end_location}
-                                        </h4>
-                                        <ul className="divide-y divide-gray-200 rounded-md border border-gray-200 overflow-hidden">
-                                            {ride.bookings.length === 0 ? (
-                                                <li className="py-4 text-gray-600 text-center">
-                                                    No pending bookings for this
-                                                    ride.
-                                                </li>
-                                            ) : (
-                                                ride.bookings.map((booking) => (
-                                                    <li
-                                                        key={booking.id}
-                                                        className="flex justify-between items-center py-4 px-6 hover:bg-blue-50 transition"
-                                                    >
-                                                        <div>
-                                                            <p className="font-medium text-blue-900">
-                                                                {booking.user
-                                                                    ?.name ||
-                                                                    "Unknown User"}
-                                                            </p>
-                                                            <p className="text-sm text-gray-500">
-                                                                Booked on:{" "}
-                                                                {new Date(
-                                                                    booking.created_at,
-                                                                ).toLocaleString()}
-                                                            </p>
-                                                        </div>
-                                                        <button
-                                                            onClick={() =>
-                                                                confirmBooking(
-                                                                    booking.id,
-                                                                )
-                                                            }
-                                                            className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition"
-                                                            type="button"
-                                                        >
-                                                            Confirm
-                                                        </button>
-                                                    </li>
-                                                ))
-                                            )}
-                                        </ul>
-                                    </div>
-                                ))
+                                ridesWithBookingsList.flatMap((ride) =>
+                                    ride.bookings.map((booking: any) => (
+                                        <BookingItem
+                                            key={booking.id}
+                                            booking={booking}
+                                            ride={ride}
+                                            currentUserId={user.id}
+                                            onConfirm={confirmBooking}
+                                        />
+                                    )),
+                                )
                             )}
                         </section>
                     )}
@@ -447,4 +355,12 @@ function StatCard({ icon, title, value, color }: StatCardProps) {
             </p>
         </div>
     );
+}
+
+function formatDateTime(datetime: string) {
+    const d = new Date(datetime);
+    return {
+        date: d.toLocaleDateString(),
+        time: d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+    };
 }
