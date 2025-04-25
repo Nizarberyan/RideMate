@@ -230,7 +230,7 @@ export default function AuthenticatedLayout({
                                         </div>
                                         <div className="px-4 py-2 border-t border-gray-100 text-center">
                                             <a
-                                                href="#" // Link to notifications page
+                                                href="#"
                                                 className="text-xs text-blue-600 hover:underline font-medium"
                                             >
                                                 View all notifications
@@ -243,13 +243,8 @@ export default function AuthenticatedLayout({
                     </div>
                 </header>
                 {/* Page Content */}
-                <main className="w-full pt-4 px-4 pb-4">
-                    {/* Ensure content has enough space */}
-                    <div className="max-w-full mx-auto min-h-[calc(100vh-5rem)]">
-                        {" "}
-                        {/* Adjust min-height if needed */}
-                        {children}
-                    </div>
+                <main>
+                    <div>{children}</div>
                 </main>
             </div>
         </div>

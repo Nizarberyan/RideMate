@@ -111,7 +111,7 @@ export default function GuestLayout({
             </aside>
 
             {/* Main content - with left margin to account for fixed sidebar */}
-            <main className="lg:ml-64 min-h-screen w-full pt-16 lg:pt-0">
+            <main>
                 <div className="w-full">{children}</div>
             </main>
         </div>
