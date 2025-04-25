@@ -101,6 +101,10 @@ public function show(Ride $ride) {
             ->route('rides.index')
             ->with('success', 'Ride created successfully!');
     }
+    public function complete(Ride $ride) {
+        $ride->update(['status' => 'completed']);
+        return redirect()->back()->with('success', 'Ride completed successfully.');
+    }
 
 
 

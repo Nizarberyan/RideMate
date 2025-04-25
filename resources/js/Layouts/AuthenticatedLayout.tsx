@@ -1,4 +1,3 @@
-// resources/js/Layouts/AuthenticatedLayout.tsx
 import { Link } from "@inertiajs/react";
 import React, { useState, useEffect } from "react";
 import {
@@ -25,7 +24,6 @@ export default function AuthenticatedLayout({
 
     useEffect(() => {
         const handleOutsideClick = (event: MouseEvent) => {
-            // Only close sidebar on click outside if it's open AND screen is small (mobile view)
             if (sidebarOpen && window.innerWidth < 1024) {
                 const sidebar = document.getElementById("sidebar-auth");
                 const toggleBtn = document.getElementById(
@@ -48,7 +46,6 @@ export default function AuthenticatedLayout({
     }, [sidebarOpen]);
 
     return (
-        // Removed lg:flex-row as sidebar and main content are positioned independently now
         <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 antialiased">
             {/* Mobile sidebar toggle - Remains fixed */}
             <div className="lg:hidden fixed top-4 left-4 z-50">
@@ -73,12 +70,12 @@ export default function AuthenticatedLayout({
                 />
             )}
 
-            {/* Sidebar - Changed to always be fixed */}
+            {/* Sidebar */}
             <aside
                 id="sidebar-auth"
                 className={`fixed top-0 left-0 z-40 h-screen w-64 transform transition-transform duration-300 ease-in-out
                     bg-white/90 backdrop-blur-md shadow-lg overflow-y-auto
-                    ${sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}`} // Show by default on lg screens
+                    ${sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}`}
             >
                 {/* Sidebar Content */}
                 <div className="h-full flex flex-col py-6">
@@ -86,7 +83,6 @@ export default function AuthenticatedLayout({
                         <h1 className="text-2xl font-bold text-gray-800">
                             RideMate
                         </h1>
-                        {/* Optional: Add close button for mobile inside sidebar */}
                         <button
                             onClick={() => setSidebarOpen(false)}
                             className="lg:hidden p-1 text-gray-500 hover:text-gray-700"
@@ -95,20 +91,25 @@ export default function AuthenticatedLayout({
                         </button>
                     </div>
 
-                    {/* User profile section */}
+                    {/* User profile section - Name clickable to profile, removed profile button */}
                     <div className="px-6 mb-6">
-                        <div className="flex items-center p-3 bg-blue-50 rounded-xl">
-                            <div className="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center text-white font-semibold">
-                                {auth.user.name.charAt(0).toUpperCase()}
-                            </div>
-                            <div className="ml-3 overflow-hidden">
-                                <p className="text-sm font-medium text-gray-800 truncate">
-                                    {auth.user.name}
-                                </p>
-                                <p className="text-xs text-gray-500 truncate">
-                                    {auth.user.email}
-                                </p>
-                            </div>
+                        <div className="flex items-center p-3 bg-blue-50 rounded-xl cursor-pointer">
+                            <Link
+                                href="/profile"
+                                className="flex items-center w-full"
+                            >
+                                <div className="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center text-white font-semibold">
+                                    {auth.user.name.charAt(0).toUpperCase()}
+                                </div>
+                                <div className="ml-3 overflow-hidden">
+                                    <p className="text-sm font-medium text-gray-800 truncate hover:underline">
+                                        {auth.user.name}
+                                    </p>
+                                    <p className="text-xs text-gray-500 truncate">
+                                        {auth.user.email}
+                                    </p>
+                                </div>
+                            </Link>
                         </div>
                     </div>
 
@@ -123,13 +124,7 @@ export default function AuthenticatedLayout({
                                 Dashboard
                             </span>
                         </Link>
-                        <Link
-                            href="/profile"
-                            className="group flex items-center px-4 py-3 rounded-lg transition-all duration-300 ease-in-out text-gray-600 hover:bg-blue-50 hover:text-blue-600"
-                        >
-                            <User className="mr-3 w-5 h-5 group-hover:text-blue-500 transition-colors" />
-                            <span className="text-sm font-medium">Profile</span>
-                        </Link>
+
                         <Link
                             href="/bookings"
                             className="group flex items-center px-4 py-3 rounded-lg transition-all duration-300 ease-in-out text-gray-600 hover:bg-blue-50 hover:text-blue-600"
@@ -178,11 +173,8 @@ export default function AuthenticatedLayout({
                 </div>
             </aside>
 
-            {/* Main content wrapper - Added left margin for large screens */}
+            {/* Main content wrapper */}
             <div className="lg:ml-64">
-                {" "}
-                {/* Offset content by sidebar width */}
-                {/* Top navbar - Remains sticky */}
                 <header className="sticky top-0 z-20 bg-white/80 backdrop-blur-md shadow-sm">
                     <div className="max-w-full mx-auto px-4">
                         <div className="flex justify-end h-16 items-center">
@@ -195,7 +187,6 @@ export default function AuthenticatedLayout({
                                     className="p-2 rounded-full text-gray-500 hover:bg-gray-100 relative"
                                 >
                                     <Bell className="w-6 h-6" />
-                                    {/* Example notification dot */}
                                     <span className="absolute top-1 right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-white"></span>
                                 </button>
 
@@ -208,7 +199,6 @@ export default function AuthenticatedLayout({
                                             </h3>
                                         </div>
                                         <div className="max-h-64 overflow-y-auto">
-                                            {/* Example Notifications */}
                                             <div className="px-4 py-3 hover:bg-gray-50 border-b border-gray-50">
                                                 <p className="text-sm font-medium text-gray-800">
                                                     New ride available: City A

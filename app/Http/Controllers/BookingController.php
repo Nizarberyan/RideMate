@@ -76,4 +76,8 @@ class BookingController extends Controller
             return back()->with('error', 'Something went wrong while creating your booking. ' . $e->getMessage());
         }
     }
+    public function confirm(Booking $booking) {
+        $booking->update(['status' => 'confirmed']);
+        return redirect()->back()->with('success', 'Booking confirmed successfully.');
+    }
 }

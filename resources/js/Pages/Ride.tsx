@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useState } from "react";
 import { Head, Link, usePage } from "@inertiajs/react";
 import {
     FaMapMarkerAlt,
@@ -11,83 +11,33 @@ import {
     FaArrowLeft,
 } from "react-icons/fa";
 import { ArrowRight } from "lucide-react";
-import { EditRideModal } from "@/components/EditRideModal"; // Adjust path
-import { useState } from "react";
+import { EditRideModal } from "@/components/EditRideModal";
 import { Button } from "@/components/ui/button";
 import { router } from "@inertiajs/react";
 import { useRideStatus } from "@/hooks/useRideStatus";
-
-interface User {
-    id: number;
-    name: string;
-    email: string;
-}
-
-interface Ride {
-    id: number;
-    driver_id: number;
-    start_location: string;
-    end_location: string;
-    departure_datetime: string;
-    available_seats: number;
-    status: "active" | "completed" | "cancelled";
-    description: string | null;
-    distance_km: number | null;
-    driver: User;
-}
+import type { Ride } from "./Rides";
 
 interface PageProps {
-    auth: {
-        user: User | null;
-    };
+    [key: string]: unknown;
     ride: Ride;
-    flash: {
-        error: string | null;
-        success: string | null;
+    auth: {
+        user: {
+            id: number;
+            name: string;
+            email: string;
+        } | null;
     };
-    [key: string]: any;
+    flash: {
+        error?: string;
+        success?: string;
+    };
 }
-
-// Helper function for status colors and text
-const getStatusStyle = (status: Ride["status"]) => {
-    switch (status) {
-        case "active":
-            return {
-                badgeBg: "bg-green-100 dark:bg-green-900",
-                badgeText: "text-green-800 dark:text-green-200",
-                border: "border-green-500",
-                text: "Active",
-            };
-        case "completed":
-            return {
-                badgeBg: "bg-blue-100 dark:bg-blue-900",
-                badgeText: "text-blue-800 dark:text-blue-200",
-                border: "border-blue-500",
-                text: "Completed",
-            };
-        case "cancelled":
-            return {
-                badgeBg: "bg-red-100 dark:bg-red-900",
-                badgeText: "text-red-800 dark:text-red-200",
-                border: "border-red-500",
-                text: "Cancelled",
-            };
-        default:
-            return {
-                badgeBg: "bg-gray-100 dark:bg-gray-700",
-                badgeText: "text-gray-800 dark:text-gray-200",
-                border: "border-gray-500",
-                text: "Unknown",
-            };
-    }
-};
 
 const formatDateTime = (dateTime: string) => {
     if (!dateTime) return { date: "N/A", time: "N/A" };
     try {
         const date = new Date(dateTime);
         if (isNaN(date.getTime())) {
-            console.error("Invalid date format:", dateTime);
             return { date: "Invalid Date", time: "" };
         }
         return {
@@ -102,30 +52,25 @@ const formatDateTime = (dateTime: string) => {
                 hour12: true,
             }),
         };
-    } catch (error) {
-        console.error("Error formatting date:", error);
+    } catch {
         return { date: "Error", time: "" };
     }
 };
 
 const RideDetail = () => {
     const { ride, auth, flash } = usePage<PageProps>().props;
-    const [isEditModalOpen, setIsEditModalOpen] = useState(false); // Add state for modal
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const { date, time } = formatDateTime(ride.departure_datetime);
-    const {
-        isRideFull,
-        canBook,
-        isDriver,
-        seatsMessage,
-        statusStyle,
-        bookingStatusMessage,
-    } = useRideStatus(ride, auth.user?.id);
-
-    const handleOpenEditModal = () => setIsEditModalOpen(true);
-    const handleCloseEditModal = () => setIsEditModalOpen(false);
+    const { canBook, isDriver, statusStyle, bookingStatusMessage } =
+        useRideStatus(ride, auth.user?.id);
 
     return (
         <>
+            <Head
+                title={`Ride from ${ride.start_location} to ${ride.end_location}`}
+            />
+
+            {/* Flash Messages */}
             {flash?.error && (
                 <div className="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded-md">
                     {flash.error}
@@ -137,60 +82,58 @@ const RideDetail = () => {
                 </div>
             )}
 
-            <Head
-                title={`Ride from ${ride.start_location} to ${ride.end_location}`}
-            />
-
-            <div className="mb-6 flex items-center justify-between">
-                <h2 className="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
+            {/* Top Header */}
+            <div className="mb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-200">
                     Ride Details
                 </h2>
                 <Link
                     href="/rides"
-                    className="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md shadow-sm text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+                    className="inline-flex items-center px-3 py-1.5 text-xs font-medium rounded-md text-white bg-gray-600 hover:bg-gray-700 focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
                 >
                     <FaArrowLeft className="mr-1.5 h-3 w-3" />
                     Back to Rides
                 </Link>
             </div>
-            {/* Main content container */}
-            <div className="max-w-4xl mx-auto sm:px-6 lg:px-8">
+
+            <div className="max-w-4xl mx-auto p-4 sm:p-6 lg:p-8">
                 <div
-                    className={`bg-white dark:bg-gray-800 overflow-hidden shadow-xl sm:rounded-lg border-t-4 ${statusStyle.border}`}
+                    className={`bg-white dark:bg-gray-800 shadow-xl rounded-lg border-t-4 ${statusStyle.border}`}
                 >
-                    {/* Ride Header: Locations & Status */}
-                    <div className="p-6 sm:px-10 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
-                        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center">
-                            <div className="mb-4 sm:mb-0">
-                                <div className="flex items-center text-lg font-semibold text-gray-800 dark:text-gray-100 mb-2">
-                                    <FaMapMarkerAlt className="w-5 h-5 mr-2 text-red-500 flex-shrink-0" />
-                                    <span>{ride.start_location}</span>
-                                    <ArrowRight className="w-4 h-4 mx-3 text-gray-400 dark:text-gray-500" />
-                                    <FaMapMarkerAlt className="w-5 h-5 mr-2 text-green-500 flex-shrink-0" />
-                                    <span>{ride.end_location}</span>
-                                </div>
-                                {ride.distance_km && (
-                                    <div className="flex items-center text-sm text-gray-500 dark:text-gray-400 ml-1">
-                                        <FaRoad className="w-4 h-4 mr-1.5 text-gray-400 dark:text-gray-500" />
-                                        <span>
-                                            Approx. {ride.distance_km} km
-                                        </span>
-                                    </div>
-                                )}
+                    {/* Header Locations & Status */}
+                    <div className="p-6 sm:px-10 border-b border-gray-200 dark:border-gray-700 flex flex-wrap items-center justify-between gap-4">
+                        <div className="flex items-center flex-wrap gap-2">
+                            <div className="flex items-center text-lg font-semibold text-gray-800 dark:text-gray-100">
+                                <FaMapMarkerAlt className="w-5 h-5 mr-2 text-red-500" />
+                                <span className="truncate max-w-xs sm:max-w-md">
+                                    {ride.start_location}
+                                </span>
                             </div>
-                            <span
-                                className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${statusStyle.badgeBg} ${statusStyle.badgeText} capitalize`}
-                            >
-                                {statusStyle.text}
-                            </span>
+                            <ArrowRight className="w-4 h-4 text-gray-400 dark:text-gray-500 mx-3" />
+                            <div className="flex items-center text-lg font-semibold text-gray-800 dark:text-gray-100">
+                                <FaMapMarkerAlt className="w-5 h-5 mr-2 text-green-500" />
+                                <span className="truncate max-w-xs sm:max-w-md">
+                                    {ride.end_location}
+                                </span>
+                            </div>
                         </div>
+                        {ride.distance_km && (
+                            <div className="flex items-center text-sm text-gray-500 dark:text-gray-400 whitespace-nowrap">
+                                <FaRoad className="w-4 h-4 mr-1.5" />
+                                Approx. {ride.distance_km} km
+                            </div>
+                        )}
+                        <span
+                            className={`inline-flex px-3 py-1 rounded-full text-sm font-medium capitalize ${statusStyle.badgeBg} ${statusStyle.badgeText}`}
+                        >
+                            {statusStyle.text}
+                        </span>
                     </div>
 
-                    {/* Ride Details Body */}
-                    <div className="p-6 sm:px-10 grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 text-gray-700 dark:text-gray-300">
-                        {/* Date & Time */}
-                        <div className="flex items-center">
-                            <FaCalendarAlt className="w-5 h-5 mr-3 text-blue-500 flex-shrink-0" />
+                    {/* Details Grid */}
+                    <div className="p-6 sm:px-10 grid grid-cols-1 md:grid-cols-2 gap-6 text-gray-700 dark:text-gray-300">
+                        <div className="flex items-center space-x-3">
+                            <FaCalendarAlt className="w-5 h-5 text-blue-500" />
                             <div>
                                 <span className="font-medium text-gray-900 dark:text-gray-100">
                                     Date:
@@ -198,8 +141,8 @@ const RideDetail = () => {
                                 {date}
                             </div>
                         </div>
-                        <div className="flex items-center">
-                            <FaClock className="w-5 h-5 mr-3 text-blue-500 flex-shrink-0" />
+                        <div className="flex items-center space-x-3">
+                            <FaClock className="w-5 h-5 text-blue-500" />
                             <div>
                                 <span className="font-medium text-gray-900 dark:text-gray-100">
                                     Time:
@@ -208,19 +151,20 @@ const RideDetail = () => {
                             </div>
                         </div>
 
-                        <div className="flex items-center">
-                            <FaUser className="w-5 h-5 mr-3 text-purple-500 flex-shrink-0" />
+                        <div className="flex items-center space-x-3">
+                            <FaUser className="w-5 h-5 text-purple-500" />
                             <div>
                                 <span className="font-medium text-gray-900 dark:text-gray-100">
                                     Driver:
                                 </span>{" "}
-                                {ride.driver?.name ?? "Unknown"}
+                                <span className="truncate block max-w-[200px]">
+                                    {ride.driver?.name ?? "Unknown"}
+                                </span>
                             </div>
                         </div>
 
-                        {/* Seats Info */}
-                        <div className="flex items-center">
-                            <FaChair className="w-5 h-5 mr-3 text-orange-500 flex-shrink-0" />
+                        <div className="flex items-center space-x-3">
+                            <FaChair className="w-5 h-5 text-orange-500" />
                             <div>
                                 <span className="font-medium text-gray-900 dark:text-gray-100">
                                     Seats Available:
@@ -229,31 +173,29 @@ const RideDetail = () => {
                             </div>
                         </div>
 
-                        {/* Description */}
                         {ride.description && (
-                            <div className="md:col-span-2 flex items-start pt-2">
-                                <FaInfoCircle className="w-5 h-5 mr-3 text-gray-400 dark:text-gray-500 mt-1 flex-shrink-0" />
+                            <div className="md:col-span-2 flex items-start space-x-3 pt-2">
+                                <FaInfoCircle className="w-5 h-5 mt-1 text-gray-400 dark:text-gray-500" />
                                 <div>
                                     <span className="font-medium text-gray-900 dark:text-gray-100 block mb-1">
                                         Description:
                                     </span>
-                                    <p className="text-gray-600 dark:text-gray-400 italic">
+                                    <p className="italic text-gray-600 dark:text-gray-400 break-words">
                                         {ride.description}
                                     </p>
                                 </div>
                             </div>
                         )}
-                        {/* Add other details like price if available */}
                     </div>
 
-                    {/* Action Buttons Footer */}
-                    <div className="p-6 sm:px-10 bg-gray-50 dark:bg-gray-800/50 border-t border-gray-200 dark:border-gray-700 flex flex-col sm:flex-row items-center justify-end space-y-3 sm:space-y-0 sm:space-x-4">
+                    {/* Footer Buttons */}
+                    <div className="p-6 sm:px-10 bg-gray-50 dark:bg-gray-800/50 border-t border-gray-200 dark:border-gray-700 flex flex-col sm:flex-row justify-end items-center gap-3">
                         {canBook && (
                             <Link
                                 href={`/rides/${ride.id}/book`}
                                 method="post"
                                 as="button"
-                                className="w-full sm:w-auto inline-flex justify-center px-6 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 dark:focus:ring-offset-gray-800 disabled:opacity-50"
+                                className="w-full sm:w-auto inline-flex justify-center px-6 py-2 text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:ring-2 focus:ring-offset-2 focus:ring-green-500 dark:focus:ring-offset-gray-800 disabled:opacity-50"
                                 disabled={ride.available_seats <= 0}
                             >
                                 {ride.available_seats > 0
@@ -266,12 +208,11 @@ const RideDetail = () => {
                             <>
                                 <Button
                                     variant="outline"
-                                    onClick={handleOpenEditModal}
+                                    onClick={() => setIsEditModalOpen(true)}
                                     className="w-full sm:w-auto dark:text-gray-200 dark:border-gray-600 dark:hover:bg-gray-700"
                                 >
                                     Edit Ride
                                 </Button>
-                                {/* Keep Cancel Ride Link/Button as is */}
                                 <Button
                                     variant="destructive"
                                     onClick={() => {
@@ -293,12 +234,13 @@ const RideDetail = () => {
                         )}
 
                         {!canBook && bookingStatusMessage && (
-                            <p className="text-sm text-gray-500 dark:text-gray-400">
+                            <p className="text-sm max-w-xs text-gray-500 dark:text-gray-400 text-center sm:text-left">
                                 {bookingStatusMessage}
                             </p>
                         )}
+
                         {ride.status !== "active" && (
-                            <p className="text-sm text-gray-500 dark:text-gray-400">
+                            <p className="text-sm max-w-xs text-gray-500 dark:text-gray-400 text-center sm:text-left">
                                 This ride is {ride.status} and cannot be booked
                                 or modified.
                             </p>
@@ -306,40 +248,14 @@ const RideDetail = () => {
                     </div>
                 </div>
             </div>
-            {/* Add the Modal component at the end (or anywhere suitable) */}
+
             <EditRideModal
                 ride={ride}
                 isOpen={isEditModalOpen}
-                onClose={handleCloseEditModal}
+                onClose={() => setIsEditModalOpen(false)}
             />
-        </> // Close React Fragment
+        </>
     );
 };
-
-const isRideFull = (ride: Ride) => ride.available_seats <= 0;
-
-const RideFullWarning = () => (
-    <div className="md:col-span-2 mt-4 p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-md">
-        <div className="flex">
-            <div className="flex-shrink-0">
-                <FaInfoCircle
-                    className="h-5 w-5 text-yellow-400"
-                    aria-hidden="true"
-                />
-            </div>
-            <div className="ml-3">
-                <h3 className="text-sm font-medium text-yellow-800 dark:text-yellow-200">
-                    Ride Full
-                </h3>
-                <div className="mt-2 text-sm text-yellow-700 dark:text-yellow-300">
-                    <p>
-                        This ride is currently at full capacity. Please check
-                        back later or search for alternative rides.
-                    </p>
-                </div>
-            </div>
-        </div>
-    </div>
-);
 
 export default RideDetail;

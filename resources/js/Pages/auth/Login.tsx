@@ -17,14 +17,13 @@ export default function Login() {
 
     const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        post("/login");
+
+        post("/login", {
+            onSuccess: () => {
+                Inertia.visit("/dashboard");
+            },
+        });
     };
-    const { isAuthenticated } = useAuth();
-    useEffect(() => {
-        if (isAuthenticated) {
-            Inertia.visit("/dashboard");
-        }
-    }, []);
 
     return (
         <>

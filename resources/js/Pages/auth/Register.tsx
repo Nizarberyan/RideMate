@@ -17,14 +17,13 @@ const Register = () => {
 
     const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        post("/register");
+
+        post("/register", {
+            onSuccess: () => {
+                Inertia.visit("/dashboard");
+            },
+        });
     };
-    const { isAuthenticated } = useAuth();
-    useEffect(() => {
-        if (isAuthenticated) {
-            Inertia.visit("/dashboard");
-        }
-    }, []);
 
     return (
         <>

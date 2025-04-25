@@ -21,7 +21,8 @@ interface User {
     email: string;
 }
 
-interface Ride {
+export interface Ride {
+    bookings: any;
     id: number;
     driver_id: number;
     start_location: string;
@@ -34,7 +35,7 @@ interface Ride {
     driver: User;
 }
 
-interface PageProps {
+export interface PageProps {
     auth: {
         user: User | null;
     };
@@ -114,6 +115,9 @@ const Rides = ({ rides = [] }: PageProps) => {
         };
     };
 
+    // Inside your component
+    const [isExpanded, setIsExpanded] = useState(false);
+
     return (
         <>
             <Head title="Available Rides" />
@@ -135,81 +139,95 @@ const Rides = ({ rides = [] }: PageProps) => {
                 </div>
 
                 <div className="mb-8 bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4">
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
+                    <div className="relative w-full mb-4">
+                        <Label
+                            htmlFor="from-location"
+                            className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                        >
+                            From
+                        </Label>
                         <div className="relative">
-                            <Label
-                                htmlFor="from-location"
-                                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-                            >
-                                From
-                            </Label>
-                            <div className="relative">
-                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <FaMapMarkerAlt className="h-5 w-5 text-red-500" />
-                                </div>
-                                <input
-                                    id="from-location"
-                                    type="text"
-                                    placeholder="Departure location..."
-                                    className="block w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out sm:text-sm"
-                                    value={fromLocation}
-                                    onChange={(e) =>
-                                        setFromLocation(e.target.value)
-                                    }
-                                />
+                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <FaMapMarkerAlt className="h-5 w-5 text-red-500" />
                             </div>
-                        </div>
-
-                        <div className="relative">
-                            <Label
-                                htmlFor="to-location"
-                                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-                            >
-                                To
-                            </Label>
-                            <div className="relative">
-                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <FaMapMarkerAlt className="h-5 w-5 text-green-500" />
-                                </div>
-                                <input
-                                    id="to-location"
-                                    type="text"
-                                    placeholder="Destination location..."
-                                    className="block w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out sm:text-sm"
-                                    value={toLocation}
-                                    onChange={(e) =>
-                                        setToLocation(e.target.value)
-                                    }
-                                />
-                            </div>
-                        </div>
-
-                        <div className="relative">
-                            <Label
-                                htmlFor="status-filter"
-                                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-                            >
-                                Status
-                            </Label>
-                            <select
-                                id="status-filter"
-                                value={statusFilter}
+                            <input
+                                id="from-location"
+                                type="text"
+                                placeholder="Departure location..."
+                                className="block w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out sm:text-sm"
+                                value={fromLocation}
                                 onChange={(e) =>
-                                    setStatusFilter(e.target.value)
+                                    setFromLocation(e.target.value)
                                 }
-                                className="block w-full py-2 px-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-200 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out sm:text-sm"
-                            >
-                                <option value="all">All Statuses</option>
-                                <option value="active">Active</option>
-                                <option value="completed">Completed</option>
-                                <option value="cancelled">Cancelled</option>
-                            </select>
+                            />
                         </div>
                     </div>
+
+                    {/* Toggle button */}
+                    <button
+                        type="button"
+                        className="mb-4 text-blue-600 hover:underline text-sm"
+                        onClick={() => setIsExpanded(!isExpanded)}
+                    >
+                        {isExpanded ? "Less filters" : "More filters"}
+                    </button>
+
+                    {/* Conditionally show the rest of the filters */}
+                    {isExpanded && (
+                        <div className="grid grid-cols-1 gap-4 md:grid-cols-3 items-start">
+                            {/* To Location */}
+                            <div className="relative w-full">
+                                <Label
+                                    htmlFor="to-location"
+                                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                                >
+                                    To
+                                </Label>
+                                <div className="relative">
+                                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <FaMapMarkerAlt className="h-5 w-5 text-green-500" />
+                                    </div>
+                                    <input
+                                        id="to-location"
+                                        type="text"
+                                        placeholder="Destination location..."
+                                        className="block w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out sm:text-sm"
+                                        value={toLocation}
+                                        onChange={(e) =>
+                                            setToLocation(e.target.value)
+                                        }
+                                    />
+                                </div>
+                            </div>
+
+                            {/* Status Filter */}
+                            <div className="relative w-full">
+                                <Label
+                                    htmlFor="status-filter"
+                                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                                >
+                                    Status
+                                </Label>
+                                <select
+                                    id="status-filter"
+                                    className="block w-full appearance-none rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 py-2 px-3 pr-8 leading-tight text-gray-900 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                                    value={statusFilter}
+                                    onChange={(e) =>
+                                        setStatusFilter(e.target.value)
+                                    }
+                                >
+                                    <option value="all">All</option>
+                                    <option value="active">Active</option>
+                                    <option value="completed">Completed</option>
+                                    <option value="cancelled">Cancelled</option>
+                                </select>
+                            </div>
+                        </div>
+                    )}
                 </div>
 
                 {filteredRides.length > 0 ? (
-                    <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                         {filteredRides.map((ride) => {
                             const { date, time } = formatDateTime(
                                 ride.departure_datetime,
@@ -325,27 +343,7 @@ const Rides = ({ rides = [] }: PageProps) => {
                     </div>
                 ) : (
                     <div className="text-center bg-white dark:bg-gray-800 rounded-xl shadow-md p-10 mt-8">
-                        <FaCar
-                            className="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500"
-                            aria-hidden="true"
-                        />
-                        <h3 className="mt-4 text-lg font-semibold text-gray-800 dark:text-gray-200">
-                            No rides found
-                        </h3>
-                        <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
-                            {searchQuery || statusFilter !== "all"
-                                ? "No rides match your current filters."
-                                : "There are currently no rides available. Why not offer one?"}
-                        </p>
-                        {auth?.user && (
-                            <Link
-                                href="/rides/create"
-                                className="mt-6 inline-flex items-center justify-center px-4 py-2 bg-blue-600 border border-transparent rounded-lg font-semibold text-xs text-white uppercase tracking-widest hover:bg-blue-700 active:bg-blue-800 focus:outline-none focus:border-blue-900 focus:ring focus:ring-blue-300 disabled:opacity-25 transition ease-in-out duration-150"
-                            >
-                                <FaCar className="mr-2 -ml-1 h-4 w-4" /> Offer a
-                                Ride
-                            </Link>
-                        )}
+                        {/* No rides message */}
                     </div>
                 )}
             </div>

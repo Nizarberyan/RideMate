@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BookingController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\NotificationPreferenceController;
 use App\Http\Controllers\RideController;
 use App\Http\Controllers\testController;
@@ -22,9 +23,7 @@ Route::get('/register', function () {
     return inertia('auth/Register');
 });
 
-Route::get('/dashboard', function () {
-    return Inertia::render('Dashboard');
-})->middleware('auth')->name('dashboard');
+Route::get('/dashboard', [DashboardController::class,'index'])->middleware('auth')->name('dashboard');
 
 // Rides routes
 Route::get('/rides', [RideController::class, 'index'])->name('rides.index');
@@ -52,6 +51,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/bookings', [BookingController::class, 'create'])->name('bookings.create');
     Route::get('/bookings', [BookingController::class, 'index'])->name('bookings.index');
     Route::patch('/bookings/{booking}/cancel', [BookingController::class, 'cancel'])->name('bookings.cancel');
+    Route::patch('/bookings/{booking}/confirm', [BookingController::class, 'confirm'])->name('bookings.confirm');
 });
 
 Route::middleware('auth')->group(function () {
