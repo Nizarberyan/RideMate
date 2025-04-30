@@ -4,8 +4,8 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\NotificationPreferenceController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RideController;
-use App\Http\Controllers\testController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -24,7 +24,9 @@ Route::get('/register', function () {
 });
 
 Route::get('/dashboard', [DashboardController::class,'index'])->middleware('auth')->name('dashboard');
-
+Route::get('/profile', [ProfileController::class,'index'])->middleware('auth')->name('profile');
+Route::post('/profile', [ProfileController::class,'update'])->middleware('auth')->name('profile.update');
+Route::get('profile/{user}', [ProfileController::class, 'show'])->name('profile.show');
 // Rides routes
 Route::get('/rides', [RideController::class, 'index'])->name('rides.index');
 Route::get('/rides/search', [RideController::class, 'search'])->name('rides.search');

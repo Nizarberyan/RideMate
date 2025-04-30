@@ -17,6 +17,8 @@ class User extends Authenticatable
         'remember_token',
         'driver_status',
         'driver_opted_in_at',
+        'bio',
+        'photo',
     ];
 
     protected $hidden = [
@@ -33,7 +35,7 @@ class User extends Authenticatable
 
     public function rides(): HasMany
     {
-        return $this->hasMany(Ride::class);
+        return $this->hasMany(Ride::class, 'driver_id');
     }
 
     public function bookings(): HasMany

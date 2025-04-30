@@ -16,6 +16,7 @@ import { Label } from "@/components/ui/label";
 import { useRideStatus } from "@/hooks/useRideStatus";
 
 interface User {
+    photo: any;
     id: number;
     name: string;
     email: string;

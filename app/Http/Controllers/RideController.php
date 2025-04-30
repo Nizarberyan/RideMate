@@ -22,8 +22,10 @@ class RideController extends Controller
     ]);
 }
 public function show(Ride $ride) {
+
     return Inertia::render('Ride', [
         'ride' => $ride->load('driver'),
+
         'flash' => [
             'error' => session('error'),
             'success' => session('success')

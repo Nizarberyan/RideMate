@@ -63,6 +63,7 @@ const RideDetail = () => {
     const { date, time } = formatDateTime(ride.departure_datetime);
     const { canBook, isDriver, statusStyle, bookingStatusMessage } =
         useRideStatus(ride, auth.user?.id);
+    console.log(ride);
 
     return (
         <>
@@ -153,13 +154,26 @@ const RideDetail = () => {
 
                         <div className="flex items-center space-x-3">
                             <FaUser className="w-5 h-5 text-purple-500" />
-                            <div>
-                                <span className="font-medium text-gray-900 dark:text-gray-100">
-                                    Driver:
-                                </span>{" "}
-                                <span className="truncate block max-w-[200px]">
+                            <div className="flex items-center space-x-2">
+                                {ride.driver?.photo ? (
+                                    <img
+                                        src={`/storage/${ride.driver.photo}`}
+                                        alt={`${ride.driver.name}'s profile`}
+                                        className="w-8 h-8 rounded-full object-cover"
+                                    />
+                                ) : (
+                                    <div className="w-8 h-8 rounded-full bg-gray-300 text-gray-600 flex items-center justify-center font-semibold">
+                                        {ride.driver?.name
+                                            .charAt(0)
+                                            .toUpperCase()}
+                                    </div>
+                                )}
+                                <Link
+                                    href={`/profile/${ride.driver?.id}`}
+                                    className="truncate max-w-[200px] text-purple-700 hover:underline dark:text-purple-300"
+                                >
                                     {ride.driver?.name ?? "Unknown"}
-                                </span>
+                                </Link>
                             </div>
                         </div>
 

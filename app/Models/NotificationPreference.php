@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class NotificationPreference extends Model
 {
     protected $fillable = [
-        'user_id',  // Add this
+        'user_id',
         'city',
         'is_active'
     ];
