@@ -17,8 +17,9 @@ export default function AuthenticatedLayout({
     auth,
 }: {
     children: React.ReactNode;
-    auth: { user: { name: string; email: string } };
+    auth: { user: { name: string; email: string; photo: string } };
 }) {
+    console.log(auth);
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [notificationsOpen, setNotificationsOpen] = useState(false);
 
@@ -98,8 +99,12 @@ export default function AuthenticatedLayout({
                                 href="/profile"
                                 className="flex items-center w-full"
                             >
-                                <div className="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center text-white font-semibold">
-                                    {auth.user.name.charAt(0).toUpperCase()}
+                                <div className="w-10 h-10 rounded-full overflow-hidden bg-blue-500 flex items-center justify-center text-white font-semibold">
+                                    <img
+                                        src={"/storage/" + auth.user.photo}
+                                        alt={auth.user.name}
+                                        className="w-full h-full object-cover"
+                                    />
                                 </div>
                                 <div className="ml-3 overflow-hidden">
                                     <p className="text-sm font-medium text-gray-800 truncate hover:underline">
@@ -142,12 +147,12 @@ export default function AuthenticatedLayout({
                             <span className="text-sm font-medium">Rides</span>
                         </Link>
                         <Link
-                            href="/settings"
+                            href="/Notifications"
                             className="group flex items-center px-4 py-3 rounded-lg transition-all duration-300 ease-in-out text-gray-600 hover:bg-blue-50 hover:text-blue-600"
                         >
                             <Settings className="mr-3 w-5 h-5 group-hover:text-blue-500 transition-colors" />
                             <span className="text-sm font-medium">
-                                Settings
+                                Notification preferences
                             </span>
                         </Link>
                     </nav>

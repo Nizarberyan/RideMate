@@ -17,15 +17,18 @@ class RideController extends Controller
     public function index()
 {
     $rides = Ride::with('driver')->latest()->get();
+    $ridesWithCarbonSaving = $rides->map(function ($ride) {
+        return array_merge($ride->toArray(), ['carbonSavingKg' => $ride->carbonSavingKg()]);
+    });
     return Inertia::render('Rides', [
-        'rides' => $rides
+        'rides' => $ridesWithCarbonSaving
     ]);
 }
 public function show(Ride $ride) {
 
     return Inertia::render('Ride', [
         'ride' => $ride->load('driver'),
-
+        'carbonSavingKg' => $ride->carbonSavingKg(),
         'flash' => [
             'error' => session('error'),
             'success' => session('success')
@@ -105,6 +108,20 @@ public function show(Ride $ride) {
     }
     public function complete(Ride $ride) {
         $ride->update(['status' => 'completed']);
+        $carbonSavingKg = $ride->carbonSavingKg();
+        Log::info($carbonSavingKg > 0 ? 'Carbon saving found' : 'No carbon saving found', []);
+        $bookedUsers = $ride->bookings()
+            ->where('status', 'confirmed')
+            ->with('user')
+            ->get()
+            ->pluck('user')
+            ->filter();
+        foreach ($bookedUsers as $user) {
+            $user->increment('carbon_saving_kg', $carbonSavingKg);
+            Log::info('Carbon saving incremented', []);
+        }
+        Log::info('Ride completed', []);
+
         return redirect()->back()->with('success', 'Ride completed successfully.');
     }
 

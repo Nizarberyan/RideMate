@@ -12,6 +12,8 @@ import {
     FaChair,
     FaRoad,
     FaMapMarkerAlt,
+    FaUsers,
+    FaCarSide,
 } from "react-icons/fa";
 import type { Ride } from "@/Pages/Rides";
 import axios from "axios";
@@ -23,6 +25,13 @@ interface User {
     id: number;
     name: string;
     email: string;
+    photo: string;
+    role?: string;
+}
+
+interface AdminData {
+    users?: User[];
+    rides?: Ride[];
 }
 
 interface Props {
@@ -40,21 +49,27 @@ interface Props {
     };
     rides?: Ride[];
     ridesWithBookings?: Ride[];
+    adminData?: AdminData;
 }
 
-type TabKey = "home" | "statsRideStatus" | "yourRides" | "manageBookings";
-
+// And destructure like this in the function:
 export default function Dashboard({
     auth,
     stats,
     rides,
     ridesWithBookings,
+    adminData,
 }: Props) {
+    // ...rest stays the same
+    console.log(ridesWithBookings);
     const user = auth.user;
     const [ridesList, setRidesList] = useState(rides || []);
     const [ridesWithBookingsList, setRidesWithBookingsList] = useState(
         ridesWithBookings || [],
     );
+
+    const [adminUsers, setAdminUsers] = useState(adminData?.users || []);
+    const [adminRides, setAdminRides] = useState(adminData?.rides || []);
 
     const [activeTab, setActiveTab] = useState<TabKey>("home");
 
@@ -99,7 +114,7 @@ export default function Dashboard({
 
     const confirmBooking = async (bookingId: number) => {
         try {
-            await axios.patch(`/bookings/${bookingId}/confirm`);
+            router.patch(`/bookings/${bookingId}/confirm`);
             setRidesWithBookingsList((prevRides) =>
                 prevRides.map((ride) => ({
                     ...ride,
@@ -112,17 +127,27 @@ export default function Dashboard({
             alert("Failed to confirm booking");
         }
     };
+    const cancelBooking = async (bookingId: number) => {
+        try {
+            router.patch(`/bookings/${bookingId}/cancel`);
+            setRidesWithBookingsList((prevRides) =>
+                prevRides.map((ride) => ({
+                    ...ride,
+                    bookings: ride.bookings.filter(
+                        (b: any) => b.id !== bookingId,
+                    ),
+                })),
+            );
+        } catch (error) {
+            alert("Failed to cancel booking");
+        }
+    };
 
     const tabs: { key: TabKey; label: string; icon: React.ReactNode }[] = [
         {
             key: "home",
             label: "Home",
             icon: <FaUserCircle className="w-5 h-5 text-blue-600" />,
-        },
-        {
-            key: "statsRideStatus",
-            label: "Stats & Ride Status",
-            icon: <FaCar className="w-5 h-5 text-purple-600" />,
         },
         {
             key: "yourRides",
@@ -136,6 +161,14 @@ export default function Dashboard({
         },
     ];
 
+    if (user.role === "admin") {
+        tabs.push({
+            key: "adminPanel",
+            label: "Admin Panel",
+            icon: <FaUsers className="w-5 h-5 text-red-600" />,
+        });
+    }
+
     return (
         <div className="min-h-screen bg-gray-100 p-8">
             <div className="max-w-5xl mx-auto bg-white shadow-xl rounded-lg overflow-hidden animate-fadeIn">
@@ -146,7 +179,6 @@ export default function Dashboard({
                     </h1>
                 </header>
 
-                {/* Navbar */}
                 <nav className="bg-blue-50 flex space-x-4 px-6 py-4 border-b border-blue-200">
                     {tabs.map(({ key, label, icon }) => (
                         <button
@@ -166,27 +198,31 @@ export default function Dashboard({
                 </nav>
 
                 <main className="p-10 space-y-8 min-h-[400px]">
-                    {/* Home tab */}
                     {activeTab === "home" && (
-                        <section className="flex items-center gap-6 bg-blue-50 p-6 rounded-lg shadow-md">
-                            <FaUserCircle className="text-blue-600 w-20 h-20" />
-                            <div>
-                                <h2 className="text-3xl font-semibold text-blue-900">
-                                    Welcome back, {user.name}!
-                                </h2>
-                                <p className="mt-1 text-gray-700">
-                                    Your registered email:{" "}
-                                    <span className="font-medium">
-                                        {user.email}
-                                    </span>
-                                </p>
-                            </div>
-                        </section>
-                    )}
-
-                    {/* Stats & Ride Status tab */}
-                    {activeTab === "statsRideStatus" && (
                         <>
+                            <section className="flex items-center gap-6 bg-blue-50 p-6 rounded-lg shadow-md mb-8">
+                                {user.photo ? (
+                                    <img
+                                        src={"/storage/" + user.photo}
+                                        alt={user.name}
+                                        className="w-20 h-20 rounded-full"
+                                    />
+                                ) : (
+                                    <FaUserCircle className="text-blue-600 w-20 h-20" />
+                                )}
+                                <div>
+                                    <h2 className="text-3xl font-semibold text-blue-900">
+                                        Welcome back, {user.name}!
+                                    </h2>
+                                    <p className="mt-1 text-gray-700">
+                                        Your registered email:{" "}
+                                        <span className="font-medium">
+                                            {user.email}
+                                        </span>
+                                    </p>
+                                </div>
+                            </section>
+
                             <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                                 <StatCard
                                     icon={
@@ -266,8 +302,6 @@ export default function Dashboard({
                             </section>
                         </>
                     )}
-
-                    {/* Your Rides tab */}
                     {activeTab === "yourRides" && (
                         <section className="space-y-6">
                             {ridesList.length === 0 && (
@@ -276,16 +310,45 @@ export default function Dashboard({
                                 </p>
                             )}
                             {ridesList.map((ride) => (
-                                <RideItem
+                                <div
                                     key={ride.id}
-                                    ride={ride}
-                                    currentUserId={user.id}
-                                />
+                                    className="border rounded p-4 shadow-sm"
+                                >
+                                    <RideItem
+                                        ride={ride}
+                                        currentUserId={user.id}
+                                    />
+                                    {ride.status === "active" && (
+                                        <div className="mt-4 flex gap-3">
+                                            <button
+                                                onClick={() =>
+                                                    updateRideStatus(
+                                                        ride.id,
+                                                        "completed",
+                                                    )
+                                                }
+                                                className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded"
+                                            >
+                                                Complete
+                                            </button>
+                                            <button
+                                                onClick={() =>
+                                                    updateRideStatus(
+                                                        ride.id,
+                                                        "cancelled",
+                                                    )
+                                                }
+                                                className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded"
+                                            >
+                                                Cancel
+                                            </button>
+                                        </div>
+                                    )}
+                                </div>
                             ))}
                         </section>
                     )}
 
-                    {/* Manage Bookings tab */}
                     {activeTab === "manageBookings" && (
                         <section className="space-y-8">
                             {ridesWithBookingsList.length === 0 ? (
@@ -301,10 +364,91 @@ export default function Dashboard({
                                             ride={ride}
                                             currentUserId={user.id}
                                             onConfirm={confirmBooking}
+                                            onCancel={cancelBooking}
                                         />
                                     )),
                                 )
                             )}
+                        </section>
+                    )}
+
+                    {activeTab === "adminPanel" && user.role === "admin" && (
+                        <section className="space-y-8">
+                            <h2 className="text-2xl font-bold text-red-700 mb-4">
+                                Admin Management
+                            </h2>
+
+                            <div className="bg-white p-6 rounded-lg shadow-md space-y-6">
+                                <section>
+                                    <h3 className="font-semibold mb-4 text-gray-800">
+                                        Users
+                                    </h3>
+                                    {adminUsers.length === 0 ? (
+                                        <p className="text-gray-600">
+                                            No users found.
+                                        </p>
+                                    ) : (
+                                        <ul className="divide-y divide-gray-200">
+                                            {adminUsers.map((u) => (
+                                                <li
+                                                    key={u.id}
+                                                    className="py-3 flex justify-between items-center"
+                                                >
+                                                    <span className="text-gray-700">
+                                                        {u.name} ({u.email})
+                                                    </span>
+                                                    <button
+                                                        className="text-red-600 hover:bg-red-50 px-3 py-1 rounded transition text-sm"
+                                                        onClick={() =>
+                                                            alert(
+                                                                `Delete user ${u.name} (not implemented)`,
+                                                            )
+                                                        }
+                                                    >
+                                                        Delete
+                                                    </button>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    )}
+                                </section>
+
+                                <section>
+                                    <h3 className="font-semibold mb-4 text-gray-800">
+                                        Rides
+                                    </h3>
+                                    {adminRides.length === 0 ? (
+                                        <p className="text-gray-600">
+                                            No rides found.
+                                        </p>
+                                    ) : (
+                                        <ul className="divide-y divide-gray-200">
+                                            {adminRides.map((ride) => (
+                                                <li
+                                                    key={ride.id}
+                                                    className="py-3 flex justify-between items-center"
+                                                >
+                                                    <span className="text-gray-700">
+                                                        Ride from{" "}
+                                                        {ride.start_location} to{" "}
+                                                        {ride.end_location}
+                                                    </span>
+                                                    <button
+                                                        className="text-red-600 hover:bg-red-50 px-3 py-1 rounded transition text-sm"
+                                                        onClick={() =>
+                                                            alert(
+                                                                `Delete ride ${ride.id} (not implemented)`,
+                                                            )
+                                                        }
+                                                    >
+                                                        Delete
+                                                    </button>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    )}
+                                </section>
+                            </div>
                         </section>
                     )}
                 </main>

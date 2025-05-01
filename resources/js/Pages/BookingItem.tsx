@@ -25,6 +25,7 @@ interface Props {
     ride: Ride;
     currentUserId: number;
     onConfirm: (bookingId: number) => void;
+    onCancel: (bookingId: number) => void;
 }
 
 function formatDateTime(datetime: string) {
@@ -40,6 +41,7 @@ export default function BookingItem({
     ride,
     currentUserId,
     onConfirm,
+    onCancel,
 }: Props) {
     // Debugging logs to inspect the booking, ride and their nested properties
     console.debug("BookingItem debug - booking:", booking);
@@ -115,13 +117,22 @@ export default function BookingItem({
                 )}
             </div>
 
-            <button
-                onClick={() => onConfirm(booking.id)}
-                className="self-start px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition"
-                type="button"
-            >
-                Confirm Booking
-            </button>
+            <div className="flex gap-2">
+                <button
+                    onClick={() => onConfirm(booking.id)}
+                    className="self-start px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition"
+                    type="button"
+                >
+                    Confirm Booking
+                </button>
+                <button
+                    onClick={() => onCancel(booking.id)}
+                    className="self-start px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition"
+                    type="button"
+                >
+                    Cancel Booking
+                </button>
+            </div>
         </div>
     );
 }

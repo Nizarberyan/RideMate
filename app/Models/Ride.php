@@ -51,6 +51,19 @@ class Ride extends Model
     {
         return $this->hasMany(Booking::class);
     }
+    public function reviews(): HasMany
+    {
+        return $this->hasMany(RideReview::class);
+    }
+    public function carbonSavingKg(): float {
+        $distanceKm = $this->distance_km;
+        $passengers = $this->available_seats + 1;
+        $averageEmission = 150;
 
+        $emissionAlone = $distanceKm * $averageEmission;
+        $emissionShared = $emissionAlone / $passengers;
+        $carbonSavedGrams = $emissionAlone - $emissionShared;
+        return round ($carbonSavedGrams / 1000, 2);
 
+    }
 }

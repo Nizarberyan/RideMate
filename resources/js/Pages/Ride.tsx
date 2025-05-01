@@ -7,6 +7,7 @@ import {
     FaUser,
     FaChair,
     FaRoad,
+    FaLeaf,
     FaInfoCircle,
     FaArrowLeft,
 } from "react-icons/fa";
@@ -58,7 +59,7 @@ const formatDateTime = (dateTime: string) => {
 };
 
 const RideDetail = () => {
-    const { ride, auth, flash } = usePage<PageProps>().props;
+    const { ride, auth, flash, carbonSavingKg } = usePage<PageProps>().props;
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const { date, time } = formatDateTime(ride.departure_datetime);
     const { canBook, isDriver, statusStyle, bookingStatusMessage } =
@@ -184,6 +185,17 @@ const RideDetail = () => {
                                     Seats Available:
                                 </span>{" "}
                                 {ride.available_seats}
+                            </div>
+                        </div>
+                        <div className="flex items-center space-x-3">
+                            <FaLeaf className="w-5 h-5 text-green-600" />
+                            <div>
+                                <span className="font-medium text-gray-900 dark:text-gray-100">
+                                    Carbon Saved:
+                                </span>{" "}
+                                {carbonSavingKg !== undefined
+                                    ? `${carbonSavingKg} kg CO₂`
+                                    : "N/A"}
                             </div>
                         </div>
 

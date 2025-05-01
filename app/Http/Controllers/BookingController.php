@@ -80,4 +80,8 @@ class BookingController extends Controller
         $booking->update(['status' => 'confirmed']);
         return redirect()->back()->with('success', 'Booking confirmed successfully.');
     }
+    public function cancel(Booking $booking) {
+        $booking->update(['status' => 'cancelled']);
+        return redirect()->back()->with('success', 'Booking cancelled successfully.');
+    }
 }

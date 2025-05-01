@@ -6,6 +6,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\NotificationPreferenceController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RideController;
+use App\Http\Controllers\SettingsController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -37,8 +38,9 @@ Route::get('/rides/{ride}/edit', [RideController::class, 'edit'])->name('rides.e
 Route::patch('/rides/{ride}/complete', [RideController::class, 'complete'])->name('rides.complete')->middleware('auth');
 
 
-Route::get('/rides/{ride}/book', [BookingController::class, 'create'])->name('bookings.create')->middleware('auth');
+Route::get('/rides/{ride}/book', [BookingController::class, 'store'])->name('bookings.create')->middleware('auth');
 Route::get('/bookings/{booking}', [BookingController::class, 'show'])->name('bookings.show')->middleware('auth');
+Route::patch('/bookings/{booking}/cancel', [BookingController::class, 'cancel'])->name('bookings.cancel')->middleware('auth');
 Route::middleware(['auth', 'ride.owner'])->group(function () {
     Route::put('/rides/{ride}', [RideController::class, 'update'])->name('rides.update');
     Route::patch('/rides/{ride}/cancel', [RideController::class, 'cancel'])->name('rides.cancel');
@@ -62,4 +64,6 @@ Route::middleware('auth')->group(function () {
     Route::delete('/notification-preferences/{preference}', [NotificationPreferenceController::class, 'destroy'])
         ->name('notification-preferences.destroy');
 });
+
+Route::get('/Notifications',[SettingsController::class, 'index'])->name('settings');;
 

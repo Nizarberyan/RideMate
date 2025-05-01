@@ -21,7 +21,6 @@ class ProfileController extends Controller
     public function update(Request $request)
     {
         $user = Auth::user();
-//        dd($request);
         Log::info('Profile update requested', [
             'user_id' => $user->id,
             'fields' => $request->only(['name', 'email', 'bio']),

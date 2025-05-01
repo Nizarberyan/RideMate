@@ -7,6 +7,7 @@ import {
     FaClock,
     FaUser,
     FaSearch,
+    FaLeaf,
     FaRoad,
     FaChair,
     FaInfoCircle,
@@ -23,6 +24,7 @@ interface User {
 }
 
 export interface Ride {
+    carbonSavingKg: number;
     bookings: any;
     id: number;
     driver_id: number;
@@ -164,67 +166,69 @@ const Rides = ({ rides = [] }: PageProps) => {
                         </div>
                     </div>
 
-                    {/* Toggle button */}
+                    {/* Toggle button visible only on small screens */}
                     <button
                         type="button"
-                        className="mb-4 text-blue-600 hover:underline text-sm"
+                        className="mb-4 text-blue-600 hover:underline text-sm md:hidden"
                         onClick={() => setIsExpanded(!isExpanded)}
                     >
                         {isExpanded ? "Less filters" : "More filters"}
                     </button>
 
-                    {/* Conditionally show the rest of the filters */}
-                    {isExpanded && (
-                        <div className="grid grid-cols-1 gap-4 md:grid-cols-3 items-start">
-                            {/* To Location */}
-                            <div className="relative w-full">
-                                <Label
-                                    htmlFor="to-location"
-                                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-                                >
-                                    To
-                                </Label>
-                                <div className="relative">
-                                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                        <FaMapMarkerAlt className="h-5 w-5 text-green-500" />
-                                    </div>
-                                    <input
-                                        id="to-location"
-                                        type="text"
-                                        placeholder="Destination location..."
-                                        className="block w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out sm:text-sm"
-                                        value={toLocation}
-                                        onChange={(e) =>
-                                            setToLocation(e.target.value)
-                                        }
-                                    />
+                    {/* Filters container: always show on md+, toggle on smaller */}
+                    <div
+                        className={`grid grid-cols-1 gap-4 md:grid-cols-3 items-start ${
+                            isExpanded ? "block" : "hidden"
+                        } md:block`}
+                    >
+                        {/* To Location */}
+                        <div className="relative w-full">
+                            <Label
+                                htmlFor="to-location"
+                                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                            >
+                                To
+                            </Label>
+                            <div className="relative">
+                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <FaMapMarkerAlt className="h-5 w-5 text-green-500" />
                                 </div>
-                            </div>
-
-                            {/* Status Filter */}
-                            <div className="relative w-full">
-                                <Label
-                                    htmlFor="status-filter"
-                                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-                                >
-                                    Status
-                                </Label>
-                                <select
-                                    id="status-filter"
-                                    className="block w-full appearance-none rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 py-2 px-3 pr-8 leading-tight text-gray-900 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                                    value={statusFilter}
+                                <input
+                                    id="to-location"
+                                    type="text"
+                                    placeholder="Destination location..."
+                                    className="block w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out sm:text-sm"
+                                    value={toLocation}
                                     onChange={(e) =>
-                                        setStatusFilter(e.target.value)
+                                        setToLocation(e.target.value)
                                     }
-                                >
-                                    <option value="all">All</option>
-                                    <option value="active">Active</option>
-                                    <option value="completed">Completed</option>
-                                    <option value="cancelled">Cancelled</option>
-                                </select>
+                                />
                             </div>
                         </div>
-                    )}
+
+                        {/* Status Filter */}
+                        <div className="relative w-full">
+                            <Label
+                                htmlFor="status-filter"
+                                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                            >
+                                Status
+                            </Label>
+                            <select
+                                id="status-filter"
+                                className="block w-full appearance-none rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 py-2 px-3 pr-8 leading-tight text-gray-900 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                                value={statusFilter}
+                                onChange={(e) =>
+                                    setStatusFilter(e.target.value)
+                                }
+                            >
+                                <option value="all">All</option>
+                                <option value="active">Active</option>
+                                <option value="completed">Completed</option>
+                                <option value="cancelled">Cancelled</option>
+                            </select>
+                        </div>
+                    </div>
                 </div>
 
                 {filteredRides.length > 0 ? (
@@ -301,6 +305,15 @@ const Rides = ({ rides = [] }: PageProps) => {
                                                 <FaRoad className="w-4 h-4 mr-2 text-blue-500" />
                                                 <span>
                                                     {ride.distance_km} km
+                                                </span>
+                                            </div>
+                                        )}
+                                        {typeof ride.carbonSavingKg && (
+                                            <div className="flex items-center text-green-600 dark:text-green-400 mt-1 font-semibold">
+                                                <FaLeaf className="w-4 h-4 mr-2" />
+                                                <span>
+                                                    {ride.carbonSavingKg} kg CO₂
+                                                    saved
                                                 </span>
                                             </div>
                                         )}

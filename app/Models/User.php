@@ -19,6 +19,7 @@ class User extends Authenticatable
         'driver_opted_in_at',
         'bio',
         'photo',
+        'carbon_saving_kg'
     ];
 
     protected $hidden = [
