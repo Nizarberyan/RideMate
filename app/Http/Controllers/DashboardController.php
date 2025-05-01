@@ -54,7 +54,7 @@ class DashboardController extends Controller
     if ($user->role === 'admin') {
         $adminData = [
             'users' => User::all(),
-            'rides' => Ride::all(),
+            'rides' => Ride::with('driver')->get(),
         ];
     }
 

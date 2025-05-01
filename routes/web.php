@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\DashboardController;
@@ -65,5 +66,9 @@ Route::middleware('auth')->group(function () {
         ->name('notification-preferences.destroy');
 });
 
-Route::get('/Notifications',[SettingsController::class, 'index'])->name('settings');;
+Route::get('/Notifications',[SettingsController::class, 'index'])->name('settings');
 
+Route::middleware(['auth', 'admin'])->group(function () {
+    Route::delete('admin/users/{user}', [AdminController::class, 'deleteUser'])->name('admin.make-admin');
+    Route::delete('admin/rides/{ride}', [AdminController::class, 'deleteRide'])->name('admin.delete-ride');
+});
