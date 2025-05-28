@@ -39,19 +39,24 @@ const Home: React.FC = () => {
                             footprint.
                         </p>
                         <div className="flex flex-col sm:flex-row gap-4 justify-center mt-12">
-                            <Button
-                                size="lg"
-                                className="bg-green-600 hover:bg-green-700 shadow-lg shadow-green-500/20 transform transition-all duration-200 hover:scale-105 text-lg px-8 py-6"
-                            >
-                                Find a Ride <Car className="ml-2 h-5 w-5" />
-                            </Button>
-                            <Button
-                                size="lg"
-                                variant="outline"
-                                className="border-2 border-green-600 text-green-600 hover:bg-green-50 transform transition-all duration-200 hover:scale-105 text-lg px-8 py-6"
-                            >
-                                Offer a Ride <Users className="ml-2 h-5 w-5" />
-                            </Button>
+                            <a href="/register">
+                                <Button
+                                    size="lg"
+                                    className="bg-green-600 hover:bg-green-700 shadow-lg shadow-green-500/20 transform transition-all duration-200 hover:scale-105 text-lg px-8 py-6"
+                                >
+                                    Find a Ride <Car className="ml-2 h-5 w-5" />
+                                </Button>
+                            </a>
+                            <a href="/register">
+                                <Button
+                                    size="lg"
+                                    variant="outline"
+                                    className="border-2 border-green-600 text-green-600 hover:bg-green-50 transform transition-all duration-200 hover:scale-105 text-lg px-8 py-6"
+                                >
+                                    Offer a Ride{" "}
+                                    <Users className="ml-2 h-5 w-5" />
+                                </Button>
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -149,13 +154,15 @@ const Home: React.FC = () => {
                         </span>
                         ?
                     </h2>
-                    <Button
-                        size="lg"
-                        className="bg-green-600 hover:bg-green-700 shadow-lg shadow-green-500/20 transform transition-all duration-200 hover:scale-105 text-xl px-10 py-7"
-                    >
-                        Join RideMate Now{" "}
-                        <ChevronRight className="ml-2 h-6 w-6" />
-                    </Button>
+                    <a href="/register">
+                        <Button
+                            size="lg"
+                            className="bg-green-600 hover:bg-green-700 shadow-lg shadow-green-500/20 transform transition-all duration-200 hover:scale-105 text-xl px-10 py-7"
+                        >
+                            Join RideMate Now{" "}
+                            <ChevronRight className="ml-2 h-6 w-6" />
+                        </Button>
+                    </a>
                 </div>
             </section>
         </div>
